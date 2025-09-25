@@ -76,6 +76,10 @@ class RedisClient
         @io.write(buffer)
       rescue SystemCallError, IOError, OpenSSL::SSL::SSLError => error
         raise connection_error(error.message)
+      rescue Error => error
+        error._set_config(config)
+        error._set_retry_attempt(@retry_attempt)
+        raise error
       end
     end
 
@@ -88,6 +92,10 @@ class RedisClient
         @io.write(buffer)
       rescue SystemCallError, IOError, OpenSSL::SSL::SSLError => error
         raise connection_error(error.message)
+      rescue Error => error
+        error._set_config(config)
+        error._set_retry_attempt(@retry_attempt)
+        raise error
       end
     end
 
@@ -101,6 +109,10 @@ class RedisClient
       raise RedisClient::ProtocolError.with_config(error.message, config)
     rescue SystemCallError, IOError, OpenSSL::SSL::SSLError => error
       raise connection_error(error.message)
+    rescue Error => error
+      error._set_config(config)
+      error._set_retry_attempt(@retry_attempt)
+      raise error
     end
 
     def measure_round_trip_delay
